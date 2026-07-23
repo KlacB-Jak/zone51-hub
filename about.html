@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZONE 51 • Описание учреждения</title>
+    <link rel="icon" href="assets/icon.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .crt-effect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.1) 80%,rgba(0,0,0,0.3) 100%)}
+        .crt-scanlines{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;background:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);animation:scanlinesMove 0.5s linear infinite}
+        @keyframes scanlinesMove{0%{background-position:0 0}100%{background-position:0 4px}}
+        .crt-reflect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9996;background:radial-gradient(ellipse at 20% 10%,rgba(255,255,255,0.02) 0%,transparent 60%)}
+        .crt-flicker{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9995;background:rgba(0,0,0,0.01);opacity:0;animation:flicker 10s ease-in-out infinite}
+        @keyframes flicker{0%,96%,100%{opacity:0}97%{opacity:0.2}98%{opacity:0}99%{opacity:0.1}}
+        .moisture-effect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9994;background:radial-gradient(ellipse at 60% 40%,rgba(100,180,200,0.015) 0%,transparent 70%);opacity:0.2;animation:moistureBreath 6s ease-in-out infinite}
+        @keyframes moistureBreath{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:0.35;transform:scale(1.05)}}
+
+        .main-container{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+        .main-content{background:rgba(14,21,28,0.6);padding:2.5rem 3rem;border-left:4px solid var(--border);box-shadow:0 0 60px rgba(0,0,0,0.2);position:relative;min-height:60vh;backdrop-filter:blur(2px)}
+        .page-head{margin-bottom:2rem;border-bottom:2px solid var(--border);padding-bottom:1.5rem}
+        .page-title{font-size:2rem;font-weight:600;color:var(--text-primary);letter-spacing:8px;text-transform:uppercase;border-left:4px solid var(--text-error);padding-left:20px;font-family:'Courier New',monospace}
+        .page-sub{font-size:0.7rem;color:var(--text-dim);letter-spacing:5px;text-transform:uppercase;font-family:'Courier New',monospace;margin-top:0.2rem;padding-left:24px}
+
+        /* ===== БЛОКИ ===== */
+        .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin:2rem 0}
+        .info-card{background:rgba(17,26,34,0.3);border:1px solid var(--border);padding:1.2rem 1.5rem;transition:all 0.3s ease}
+        .info-card:hover{border-color:var(--accent);background:rgba(17,26,34,0.5)}
+        .info-card .label{font-size:0.5rem;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace}
+        .info-card .value{font-size:1rem;color:var(--text-primary);margin-top:0.3rem;font-family:'Courier New',monospace;letter-spacing:0.5px}
+        .info-card .value.redacted{color:var(--text-error);background:rgba(180,50,40,0.04);padding:0 8px;border:1px solid rgba(180,50,40,0.1);display:inline-block;font-size:0.85rem}
+
+        .about-text{color:var(--text-secondary);font-size:0.95rem;line-height:1.9;margin:1.5rem 0}
+        .about-text p{margin-bottom:1.2rem;text-indent:2rem;text-align:justify}
+        .about-text .hl{color:var(--text-error);font-weight:500}
+        .about-text .hl-accent{color:var(--accent-soft);font-weight:500}
+        .about-text .hl-red{color:#CD7F32;font-weight:500}
+
+        .map-container{width:100%;height:400px;background:var(--bg-deep);border:2px solid var(--border);margin:2rem 0;position:relative;overflow:hidden;border-radius:1px}
+        .map-container iframe{width:100%;height:100%;border:none;filter:grayscale(0.6) contrast(1.1)}
+        .map-container .map-overlay{position:absolute;bottom:15px;left:15px;background:rgba(10,15,20,0.9);padding:0.5rem 1.2rem;border-left:3px solid var(--text-error);font-size:0.55rem;color:var(--text-dim);letter-spacing:2px;font-family:'Courier New',monospace;pointer-events:none}
+        .map-container .map-overlay span{color:var(--text-primary)}
+
+        .back-link{display:inline-block;color:var(--text-dim);text-decoration:none;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace;border-bottom:1px solid var(--border);padding-bottom:2px;transition:all 0.3s ease;cursor:pointer;margin-top:0.5rem}
+        .back-link:hover{color:var(--text-primary);border-bottom-color:var(--accent)}
+
+        .footer-bar{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.6rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;font-family:'Courier New',monospace}
+
+        @media (max-width:700px){.info-grid{grid-template-columns:1fr}.map-container{height:300px}.page-title{font-size:1.5rem;letter-spacing:4px}}
+        @media (max-width:480px){.page-title{font-size:1.2rem;letter-spacing:3px}.map-container{height:220px}.about-text{font-size:0.85rem}}
+    </style>
+</head>
+<body>
+
+    <div class="crt-effect"></div>
+    <div class="crt-scanlines"></div>
+    <div class="crt-reflect"></div>
+    <div class="crt-flicker"></div>
+    <div class="moisture-effect"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-left">
+                <span class="header-call"><link rel="stylesheet" href="main.html">ZONE 51</span>
+                <span class="header-divider">|</span>
+                <span class="header-logo">ОПИСАНИЕ УЧРЕЖДЕНИЯ</span>
+            </div>
+            <div class="header-right">
+                <span class="header-time" id="headerTime">--:-- UTC</span>
+            </div>
+        </div>
+        <div class="header-line"></div>
+    </header>
+
+    <main class="main-container">
+        <div class="main-content">
+
+            <div class="page-head">
+                <div class="page-title">Зона 51</div>
+                <div class="page-sub">Основная информация • Объект «Заря»</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Официальное обозначение:</div>
+                    <div class="value">Зона 51 | "Заря"</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Префиксы:</div>
+                    <div class="value redacted">Armed, Containment, Research</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Назначение:</div>
+                    <div class="value redacted">Зона 51 представляет собой высоко охраняемое учреждение, предназначенное для содержания, хранения и исследования аномальных объектов широкого спектра, а также сдерживания [ДАННЫЕ ОТСУТСТВУЮТ]</div>
+                </div>
+                <div class="info-card" style="grid-column:1/2">
+                    <div class="label">Местоположение</div>
+                    <div class="value" style="font-size:0.85rem;">68.75897184155062, 161.469729944181</div>
+                </div>
+                <div class="info-card" style="grid-column:2/3">
+                    <div class="label">Функция</div>
+                    <div class="value" style="font-size:0.85rem;">Изучение и содержание аномалий</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Размер</div>
+                    <div class="value redacted">[ДАННЫЕ ОТСУТСТВУЮТ]</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Директор учреждения</div>
+                    <div class="value redacted">[ДАННЫЕ ОТСУТСТВУЮТ]</div>
+                </div>
+            </div>
+
+            <div class="about-text">
+                <p>
+                    <span class="hl">Зона 51</span> — специализированное учреждение Фонда, созданное для изучения и классификации аномальных явлений, связанных с нарушениями пространства и времени. Объект располагается в изолированном районе Республики Саха (Якутия), вблизи посёлка Черский.
+                </p>
+                <p>
+                    <span class="hl-accent">История объекта:</span> В 1999 году Фонд принял под контроль законсервированный бункер <span class="hl-red">«Заря»</span>, построенный в советский период для проведения закрытых медико-биологических исследований. После передачи объекта Фонду была проведена полная реконструкция инфраструктуры и адаптация комплекса под современные стандарты исследований аномалий. А также сдерживания [ДАННЫЕ ОТСУТСТВУЮТ] из-за невозможности его перевозки. В настоящее время бункер функционирует как исследовательская станция с ограниченным доступом, сохраняя историческое обозначение.
+                </p>
+                <p>
+            </div>
+
+            <div class="map-container">
+                <iframe 
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=161.419729944181%2C68.70897184155062%2C161.519729944181%2C68.80897184155062&layer=mapnik&marker=68.75897184155062%2C161.469729944181"
+                    loading="lazy">
+                </iframe>
+                <div class="map-overlay">
+                    ▸ КООРДИНАТЫ: <span>68.75897184155062, 161.469729944181</span>
+                </div>
+            </div>
+
+            <a class="back-link" onclick="window.location.href='main.html'">← Возврат в главное меню</a>
+
+            <div class="footer-bar">
+                <span>ZONE 51 • ОБЪЕКТ «ЗАРЯ»</span>
+                <span>ДОСТУП ОГРАНИЧЕН</span>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ============================================================
+        // МУЗЫКА
+        // ============================================================
+
+        var ambientAbout = null;
+        var isAboutPlaying = false;
+        var musicStartedAbout = false;
+
+        function playAboutMusic() {
+            if (musicStartedAbout) return;
+            musicStartedAbout = true;
+            try {
+                var audio = new Audio('assets/sounds/ambient-main.mp3');
+                audio.loop = true;
+                audio.volume = 0.08;
+                var savedTime = sessionStorage.getItem('musicTime');
+                if (savedTime) audio.currentTime = parseFloat(savedTime);
+                var promise = audio.play();
+                if (promise) {
+                    promise.then(function() {
+                        isAboutPlaying = true;
+                    }).catch(function() {
+                        document.addEventListener('click', function startOnClick() {
+                            audio.play().then(function() {
+                                isAboutPlaying = true;
+                            }).catch(function() {});
+                            document.removeEventListener('click', startOnClick);
+                        }, { once: true });
+                    });
+                }
+                ambientAbout = audio;
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(playAboutMusic, 200);
+        });
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(playAboutMusic, 200);
+        }
+
+        setInterval(function() {
+            if (ambientAbout && isAboutPlaying) {
+                try {
+                    sessionStorage.setItem('musicTime', ambientAbout.currentTime);
+                } catch (e) {}
+            }
+        }, 1000);
+
+        document.addEventListener('visibilitychange', function() {
+            if (ambientAbout) {
+                ambientAbout.volume = document.hidden ? 0 : 0.08;
+            }
+        });
+
+        // ============================================================
+        // ЗВУКИ
+        // ============================================================
+
+        function playSound(name) {
+            try {
+                var audio = new Audio('assets/sounds/' + name + '.mp3');
+                audio.volume = 0.15;
+                audio.play().catch(function() {});
+            } catch (e) {}
+        }
+
+        document.querySelectorAll('a, .back-link').forEach(function(link) {
+            link.addEventListener('mouseenter', function() {
+                playSound('hover');
+            });
+            link.addEventListener('click', function() {
+                playSound('click');
+            });
+        });
+
+        // ============================================================
+        // ВРЕМЯ
+        // ============================================================
+
+        function updateTime() {
+            var now = new Date();
+            document.getElementById('headerTime').textContent =
+                String(now.getUTCHours()).padStart(2, '0') + ':' +
+                String(now.getUTCMinutes()).padStart(2, '0') + ' UTC';
+        }
+        updateTime();
+        setInterval(updateTime, 30000);
+
+        // ============================================================
+        // БЕЗОПАСНОСТЬ
+        // ============================================================
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.main-content')) e.preventDefault();
+        });
+    </script>
+</body>
+</html>

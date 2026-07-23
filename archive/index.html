@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СВОДКА • Zone 51</title>
+    <link rel="icon" href="assets/icon.png" type="image/png">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#1A1410;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Courier New','Times New Roman',serif;padding:2rem;position:relative}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.03) 0px,rgba(0,0,0,0.03) 2px,transparent 2px,transparent 4px);pointer-events:none;z-index:1}
+        .document-wrap{max-width:900px;width:100%;background:#E8DDD0;background-image:radial-gradient(ellipse at 20% 30%,rgba(200,180,160,0.1) 0%,transparent 50%),radial-gradient(ellipse at 80% 70%,rgba(180,160,140,0.08) 0%,transparent 50%);padding:3rem 3.5rem;position:relative;box-shadow:0 10px 60px rgba(0,0,0,0.6),inset 0 0 100px rgba(160,140,120,0.15);border:1px solid #C4B5A0;border-radius:2px}
+        .document-wrap::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent 0px,transparent 20px,rgba(160,140,120,0.03) 20px,rgba(160,140,120,0.03) 21px);pointer-events:none}
+        .watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);font-size:8rem;color:rgba(160,140,120,0.04);font-family:'Times New Roman',serif;letter-spacing:10px;pointer-events:none;user-select:none;font-weight:700}
+        .stamp{position:absolute;bottom:2.5rem;right:2.5rem;color:rgba(180,50,40,0.15);font-family:'Times New Roman',serif;font-size:2rem;font-weight:700;transform:rotate(-12deg);border:3px solid rgba(180,50,40,0.15);padding:0.3rem 1.5rem;letter-spacing:4px;pointer-events:none;user-select:none;border-radius:2px}
+        .doc-header{border-bottom:2px solid #8A7A6A;padding-bottom:1.2rem;margin-bottom:1.8rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;position:relative}
+        .doc-header .title{font-size:2rem;font-weight:700;color:#2A2018;letter-spacing:6px;text-transform:uppercase;font-family:'Times New Roman',serif}
+        .doc-header .sub{font-size:0.85rem;color:#5A4A3A;letter-spacing:2px;font-family:'Courier New',monospace;border-left:2px solid #8A7A6A;padding-left:14px}
+        .doc-header .date-stamp{font-size:0.75rem;color:#5A4A3A;background:#D4C8B8;padding:0.2rem 1rem;border:1px solid #B0A090;letter-spacing:1px;font-family:'Courier New',monospace}
+        .classification{display:inline-block;background:#8A2A1A;color:#E8DDD0;padding:0.1rem 1.5rem;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace;margin-bottom:1.5rem;border-radius:2px;border:1px solid #5A1A0A}
+        .doc-body{position:relative;z-index:2;color:#1A1410;font-size:0.95rem;line-height:1.8;font-family:'Courier New','Times New Roman',serif}
+        .doc-body p{margin-bottom:1.2rem;text-indent:2.5rem;text-align:justify}
+        .doc-body p:first-of-type{text-indent:0}
+        .doc-body .highlight{background:rgba(180,50,40,0.06);padding:0 4px;border-bottom:1px dotted #8A5A4A;font-weight:600;color:#3A2018}
+        .doc-body .redacted{background:#1A1410;color:#1A1410;padding:0 12px;user-select:none;border:1px solid #3A2A1A;font-weight:700;letter-spacing:2px;cursor:default;display:inline-block}
+        .doc-body .redacted::before{content:"████████"}
+        .doc-body .redacted:hover{background:#3A2A1A;color:#CD7F32}
+        .doc-body .redacted:hover::before{content:"ЗАСЕКРЕЧЕНО";color:#CD7F32}
+        .title-line{font-size:0.75rem;color:#5A4A3A;letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace;margin-bottom:1.5rem;border-bottom:1px dashed #B0A090;padding-bottom:0.5rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
+        .signature-block{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid #B0A090;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:0.8rem;color:#4A3A2A;font-family:'Courier New',monospace}
+        .signature-block .sig{border-bottom:1px solid #8A7A6A;padding-bottom:0.2rem;min-width:180px;font-style:italic;font-family:'Times New Roman',serif}
+        .link-archive{display:inline-block;color:#8A3A2A;text-decoration:none;border-bottom:2px solid #8A3A2A;padding-bottom:1px;font-weight:600;transition:all 0.3s ease;cursor:pointer}
+        .link-archive:hover{color:#5A2A1A;border-bottom-color:#5A2A1A;background:rgba(180,50,40,0.04);padding:0 4px}
+        .link-archive::after{content:'↗';font-size:0.7rem;margin-left:4px;opacity:0.5}
+        .doc-footer{margin-top:2rem;padding-top:1rem;border-top:1px solid #D4C8B8;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:0.6rem;color:#5A4A3A;letter-spacing:2px;font-family:'Courier New',monospace}
+        .back-link{display:inline-block;color:#8A7A6A;text-decoration:none;font-size:0.6rem;letter-spacing:2px;font-family:'Courier New',monospace;border-bottom:1px solid #B0A090;padding-bottom:2px;transition:all 0.3s ease;cursor:pointer;margin-top:1rem}
+        .back-link:hover{color:#5A4A3A;border-bottom-color:#8A7A6A}
+        @media (max-width:700px){.document-wrap{padding:1.8rem 1.5rem}.doc-header .title{font-size:1.5rem;letter-spacing:3px}.doc-body{font-size:0.88rem}.stamp{font-size:1.2rem;padding:0.1rem 1rem;bottom:1.5rem;right:1.5rem}.watermark{font-size:4rem}}
+        @media (max-width:480px){.document-wrap{padding:1.2rem}.doc-header .title{font-size:1.2rem}.doc-body{font-size:0.82rem}.doc-body p{text-indent:1.5rem}}
+    </style>
+</head>
+<body>
+    <div class="document-wrap">
+        <div class="watermark">КОНФИДЕНЦИАЛЬНО</div>
+        <div class="stamp">СОВ. СЕКРЕТНО</div>
+        <div class="doc-header">
+            <div>
+                <div class="title">СВОДКА</div>
+                <div class="sub">Объект «Заря-1» • Республика Саха</div>
+            </div>
+            <div class="date-stamp">24.02.2026</div>
+        </div>
+        <div class="classification">Гриф секретности: СОВЕРШЕННО СЕКРЕТНО</div>
+        <div class="title-line">
+            <span>Оперативная группа «Север-1»</span>
+            <span>Акт № 07/26</span>
+        </div>
+        <div class="doc-body">
+            <p>В период с 15.02.2026 по 22.02.2026 оперативной группой «Север-1» (состав: 5 агентов) проведена рекогносцировка территории в районе п. Черский, Республика Саха (Якутия). Цель — сбор данных об аномальных происшествиях в секторе и проверка информации о несанкционированной активности в зоне бывшего НИИ «Заря».</p>
+            <p>Согласно рапортам местных жителей, зафиксирован резкий рост числа исчезновений гражданских лиц, а также обнаружение тел погибших в ледяном плену. При проведении первичных поисковых мероприятий оперативной группой эксгумировано <span class="highlight">24 тела</span> погибших. Ключевая особенность: все тела находились в вертикальном положении (стоячее состояние), вокруг каждого зафиксированы кристаллические ледяные образования в форме шипов. Характер повреждений не поддаётся стандартной классификации.</p>
+            <p>В ходе дальнейшего изучения местности группой выявлен законсервированный объект — <span class="highlight">комплекс «Заря-1»</span>, около которого было обнаружено наибольшее количество тел. На стенках комплекса зафиксированы странные снежные надписи неясного происхождения. По архивным отрывочным данным, в советский период (1984–1999) в указанном бункере проводились закрытые медико-биологические эксперименты с участием персонала. Проект ликвидирован в 1999 году, объект законсервирован, документация уничтожена за исключением фрагментов сводок.</p>
+            <p>Все испытуемые (участники экспериментов) обнаружены мёртвыми при невыясненных обстоятельствах. Агентам предписано воздержаться от проникновения до особого распоряжения. На основе решения полевого командования для дальнейшей разведки и сбора биометрических данных направлен специализированный отряд.</p>
+            <p style="text-align:right;font-size:0.9rem;margin-top:1.5rem;">
+                <span class="link-archive" onclick="window.open('archive.html','_blank')">Ознакомиться с актом консервации</span>
+            </p>
+        </div>
+        <div class="signature-block">
+            <div>
+                <div>Составил: <span class="sig">███████ <span class="redacted"></span></span></div>
+                <div style="font-size:0.65rem;color:#6A5A4A;margin-top:0.2rem;">Оперативная группа «Север-1»</div>
+            </div>
+            <div style="text-align:right;">
+                <div>Утверждено: <span class="sig">████████ <span class="redacted"></span></span></div>
+                <div style="font-size:0.65rem;color:#6A5A4A;margin-top:0.2rem;">Начальник отдела полевых операций</div>
+            </div>
+        </div>
+        <a class="back-link" onclick="window.location.href='../main.html'">← Возврат в главное меню</a>
+        <div class="doc-footer">
+            <span>АРХИВ 7-Н</span>
+            <span>ДОСТУП ОГРАНИЧЕН</span>
+            <span>14.12.1999</span>
+        </div>
+    </div>
+    <script>
+        // ============================================================
+        // МУЗЫКА ДЛЯ СИНОПСИСА (СВОЯ)
+        // ============================================================
+
+        var ambientSynopsis = null;
+        var isSynopsisPlaying = false;
+        var musicStartedSynopsis = false;
+
+        function playSynopsisMusic() {
+            if (musicStartedSynopsis) return;
+            musicStartedSynopsis = true;
+            try {
+                var audio = new Audio('../assets/sounds/ambient-archive.mp3');
+                audio.loop = true;
+                audio.volume = 0.08;
+                var savedTime = sessionStorage.getItem('musicTimeSynopsis');
+                if (savedTime) audio.currentTime = parseFloat(savedTime);
+                var promise = audio.play();
+                if (promise) {
+                    promise.then(function() {
+                        isSynopsisPlaying = true;
+                        console.log('[AUDIO] Synopsis music started');
+                    }).catch(function() {
+                        document.addEventListener('click', function startOnClick() {
+                            audio.play().then(function() {
+                                isSynopsisPlaying = true;
+                            }).catch(function() {});
+                            document.removeEventListener('click', startOnClick);
+                        }, { once: true });
+                    });
+                }
+                ambientSynopsis = audio;
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(playSynopsisMusic, 200);
+        });
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(playSynopsisMusic, 200);
+        }
+
+        setInterval(function() {
+            if (ambientSynopsis && isSynopsisPlaying) {
+                try {
+                    sessionStorage.setItem('musicTimeSynopsis', ambientSynopsis.currentTime);
+                } catch (e) {}
+            }
+        }, 1000);
+
+        document.addEventListener('visibilitychange', function() {
+            if (ambientSynopsis) {
+                if (document.hidden) {
+                    ambientSynopsis.volume = 0;
+                } else {
+                    ambientSynopsis.volume = 0.08;
+                }
+            }
+        });
+
+        // ============================================================
+        // ЗВУКИ
+        // ============================================================
+
+        function playSound(name) {
+            try {
+                var audio = new Audio('../assets/sounds/' + name + '.mp3');
+                audio.volume = 0.15;
+                audio.play().catch(function() {});
+            } catch (e) {}
+        }
+
+        document.querySelectorAll('.link-archive, a, .back-link').forEach(function(link) {
+            link.addEventListener('mouseenter', function() {
+                playSound('hover');
+            });
+            link.addEventListener('click', function(e) {
+                playSound('click');
+                if (this.getAttribute('onclick')) {
+                    e.preventDefault();
+                    var href = this.getAttribute('onclick').match(/'(.*?)'/)[1];
+                    setTimeout(function() {
+                        window.open(href, '_blank');
+                    }, 150);
+                }
+            });
+        });
+
+        // ============================================================
+        // БЕЗОПАСНОСТЬ
+        // ============================================================
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.document-wrap')) e.preventDefault();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Политика • Zone 51</title>
+    <link rel="icon" href="assets/icon.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .crt-effect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.1) 80%,rgba(0,0,0,0.3) 100%)}
+        .crt-scanlines{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;background:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);animation:scanlinesMove 0.5s linear infinite}
+        @keyframes scanlinesMove{0%{background-position:0 0}100%{background-position:0 4px}}
+        .crt-reflect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9996;background:radial-gradient(ellipse at 20% 10%,rgba(255,255,255,0.02) 0%,transparent 60%)}
+        .crt-flicker{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9995;background:rgba(0,0,0,0.01);opacity:0;animation:flicker 10s ease-in-out infinite}
+        @keyframes flicker{0%,96%,100%{opacity:0}97%{opacity:0.2}98%{opacity:0}99%{opacity:0.1}}
+        .moisture-effect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9994;background:radial-gradient(ellipse at 60% 40%,rgba(100,180,200,0.015) 0%,transparent 70%);opacity:0.2;animation:moistureBreath 6s ease-in-out infinite}
+        @keyframes moistureBreath{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:0.35;transform:scale(1.05)}}
+
+        .main-container{max-width:1100px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+        .main-content{background:rgba(14,21,28,0.6);padding:2.5rem 3rem;border-left:4px solid var(--border);box-shadow:0 0 60px rgba(0,0,0,0.2);position:relative;min-height:60vh;backdrop-filter:blur(2px)}
+        .page-head{margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1rem;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+        .page-title{font-size:1.8rem;font-weight:600;color:var(--text-primary);letter-spacing:5px;text-transform:uppercase;border-left:4px solid var(--accent);padding-left:18px;font-family:'Courier New',monospace}
+        .page-sub{font-size:0.75rem;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace}
+
+        .doc-block{background:rgba(17,26,34,0.4);padding:1.5rem 2rem;border-left:4px solid var(--accent);margin-bottom:1.8rem;line-height:1.7}
+        .doc-block p{margin-bottom:0.8rem}
+        .doc-block strong{color:var(--text-primary)}
+        .doc-section{font-size:1.2rem;font-weight:600;color:var(--text-primary);border-left:3px solid var(--accent);padding-left:14px;margin:2rem 0 1rem 0;letter-spacing:2px;text-transform:uppercase;font-family:'Courier New',monospace}
+        .ex-box{background:rgba(0,0,0,0.2);padding:0.8rem 1.2rem;margin:0.8rem 0 0.8rem 1.5rem;border-left:4px solid var(--border);font-size:0.88rem}
+        .ex-box.wrong{border-left-color:var(--text-error)}
+        .ex-box.right{border-left-color:var(--success)}
+        .ex-label{font-weight:700;font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);display:block;margin-bottom:0.2rem}
+        .warning-box{background:rgba(74,122,138,0.04);padding:0.8rem 1.5rem;border-left:6px solid var(--accent);margin:1.2rem 0}
+
+        .back-link{display:inline-block;color:var(--text-dim);text-decoration:none;font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;font-family:'Courier New',monospace;border-bottom:1px solid var(--border);padding-bottom:2px;transition:all 0.3s ease;cursor:pointer;margin-top:0.5rem}
+        .back-link:hover{color:var(--text-primary);border-bottom-color:var(--accent)}
+
+        .footer-bar{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.6rem;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;font-family:'Courier New',monospace}
+
+        @media (max-width:600px){.doc-block{padding:1rem}.ex-box{margin-left:0}}
+    </style>
+</head>
+<body>
+
+    <div class="crt-effect"></div>
+    <div class="crt-scanlines"></div>
+    <div class="crt-reflect"></div>
+    <div class="crt-flicker"></div>
+    <div class="moisture-effect"></div>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-left">
+                <span class="header-call">ZONE 51</span>
+                <span class="header-divider">|</span>
+                <span class="header-logo">ПОЛИТИКА</span>
+            </div>
+            <div class="header-right">
+                <span class="header-time" id="hTime">--:-- UTC</span>
+            </div>
+        </div>
+        <div class="header-line"></div>
+    </header>
+
+    <main class="main-container">
+        <div class="main-content">
+
+            <div class="page-head">
+                <h1 class="page-title">Политика отыгрыша</h1>
+                <div class="page-sub">Свод правил и рекомендаций</div>
+            </div>
+
+            <div class="doc-block">
+                <p>Политика создана для понимания вами нормального отыгрыша, к которому стоит придерживаться. Вы можете использовать справочник как небольшое пособие по отыгрышу, мы ни в коем случае вас не ограничиваем, главное чтобы — это было адекватное РП и ваш отыгрыш был в пределах разумного. Если какие-то случаи не описаны — это не значит что разрешено, а значит нужно порассуждать и подумать как бы вы поступили в реальной жизни.</p>
+            </div>
+
+            <div class="doc-section">1. РП-действие / РП-описание</div>
+            <div class="doc-block">
+                <p>Для многих, главный инструмент для описания отыгрыша – "РП-действие / РП-описание". Но частое злоупотребление данными словосочетаниями могут вызвать кровотечение из ушей у других людей, поэтому у нас запрещено засорять голосовой чат долгими и / или бесполезными описаниями своих действий / описания, путём говора "РП-действие / РП-описание". На нашем проекте, данные фразы в принципе не приветствуются. Данные словосочетания можно использовать только на те действия, которые действительно требуют озвучки со стороны, дабы показать основную суть действия / состояния.</p>
+
+                <div class="ex-box wrong">
+                    <span class="ex-label">НЕПРАВИЛЬНО:</span>
+                    "РП-действие – открывает аптечку, после чего накладывает бинт и перебинтовывается, после чего отрезает остатки бинта, после чего закрывает аптечку, после чего убирает ее."
+                </div>
+
+                <div class="ex-box right">
+                    <span class="ex-label">ПРАВИЛЬНО:</span>
+                    [Человек отыграл открывание аптечки путём использования и моментальной отмены использования аптечки, чтобы был слышен звук] <strong style="color:var(--accent);">Агент берёт бинт из аптечки и перебинтовывает рану на левой руке</strong>, [стоит неподвижно] отрезает остатки бинта, вроде кровь остановилась.
+                </div>
+
+                <p><strong style="color:var(--accent);">Примечание:</strong> допускается быстрое описание своих действий / состояния, без упоминания "РП-действие / РП-описание".<br>
+                Например: <span style="background:rgba(0,0,0,0.2);padding:0 6px;">[от 3 лица] Вы видите как сотрудник истекает кровью.</span></p>
+            </div>
+
+            <div class="doc-section">2. Медицина</div>
+            <div class="doc-block">
+                <p>Мы не просим вас заучивать, как оказывать первую медицинскую помощь, не просим вас знать анатомию, физиологию, фармакологию от А до Я. Не смотря на это, для комфортной игры вам стоит ознакомиться с основами оказания первой медицинской помощи. Для игроков отыгрывающих мед. персонал — это обязательно.</p>
+            </div>
+
+            <div class="doc-section">3. Игровая атмосфера</div>
+            <div class="doc-block">
+                <p>Атмосфера – это неотъемлемая часть. Сами сессии могут быть с хорошим сюжетом, прописанными персонажами, но если в нем нет той атмосферы, ради которой отыгрываешь, нет ощущения погружения в происходящее – то все старания можно выкидывать в помойку. Поэтому игроки должны погружаться в атмосферу происходящего.</p>
+                <p>Потерей игровой атмосферы можно считать, например, если во время напряжённой и опасной ситуации оперативник МОГ начнёт зевать во время операции, ссылаясь на недосып. Да, это оправдано на уровне RP, но из-за этого теряется атмосфера не только у данного игрока, но и у остальных.</p>
+                <div class="warning-box">
+                    Разумеется это недопустимо у нас, мы это не одобряем.
+                </div>
+            </div>
+
+            <div class="doc-section">4. Низкий уровень отыгрыша</div>
+            <div class="doc-block">
+                <p>На сессиях действует норма на низкий уровень отыгрыша. Что это значит? Сессии созданы для полного ролевого отыгрыша где вы должны максимально вживаться в вашу роль и атмосферу. Однако, иногда, люди про это забывают: в порыве достичь победы любой ценой, наплевательски относятся к отыгрышу или излишне пренебрегают серьезностью. Из-за этого уровень отыгрыша и погружения с полного падает на неудовлетворительный. Это естественно не допустимо.</p>
+                <p>Если ваш уровень отыгрыша упал до неудовлетворительного по не уважительной причине, вы будете строго наказаны. Также бывает, что игроку не удается отыграть какие-либо ситуации или у него это плохо получается, что тоже выливается в низкий уровень отыгрыша. За такое вас наказывать не будут, а наоборот, помогут вам разобраться и подскажут, как надо было отыграть.</p>
+            </div>
+
+            <a class="back-link" onclick="window.location.href='main.html'">← Возврат в главное меню</a>
+
+            <div class="footer-bar">
+                <span>ПОЛИТИКА v2.1 • УТВЕРЖДЕНО 2026</span>
+                <span>ВНУТРЕННИЙ ДОКУМЕНТ</span>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ============================================================
+        // МУЗЫКА (ПРОДОЛЖАЕТ ИГРАТЬ)
+        // ============================================================
+
+        var ambientPol = null;
+        var isPolPlaying = false;
+        var musicStartedPol = false;
+
+        function playPolMusic() {
+            if (musicStartedPol) return;
+            musicStartedPol = true;
+            try {
+                var audio = new Audio('assets/sounds/ambient-main.mp3');
+                audio.loop = true;
+                audio.volume = 0.08;
+                var savedTime = sessionStorage.getItem('musicTime');
+                if (savedTime) audio.currentTime = parseFloat(savedTime);
+                var promise = audio.play();
+                if (promise) {
+                    promise.then(function() {
+                        isPolPlaying = true;
+                    }).catch(function() {
+                        document.addEventListener('click', function startOnClick() {
+                            audio.play().then(function() {
+                                isPolPlaying = true;
+                            }).catch(function() {});
+                            document.removeEventListener('click', startOnClick);
+                        }, { once: true });
+                    });
+                }
+                ambientPol = audio;
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(playPolMusic, 200);
+        });
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(playPolMusic, 200);
+        }
+
+        setInterval(function() {
+            if (ambientPol && isPolPlaying) {
+                try {
+                    sessionStorage.setItem('musicTime', ambientPol.currentTime);
+                } catch (e) {}
+            }
+        }, 1000);
+
+        document.addEventListener('visibilitychange', function() {
+            if (ambientPol) {
+                ambientPol.volume = document.hidden ? 0 : 0.08;
+            }
+        });
+
+        // ============================================================
+        // ЗВУКИ (только на ссылках)
+        // ============================================================
+
+        function playSound(name) {
+            try {
+                var audio = new Audio('assets/sounds/' + name + '.mp3');
+                audio.volume = 0.15;
+                audio.play().catch(function() {});
+            } catch (e) {}
+        }
+
+        document.querySelectorAll('a, .back-link').forEach(function(link) {
+            link.addEventListener('mouseenter', function() {
+                playSound('hover');
+            });
+            link.addEventListener('click', function() {
+                playSound('click');
+            });
+        });
+
+        // ============================================================
+        // ВРЕМЯ
+        // ============================================================
+
+        function update() {
+            var now = new Date();
+            document.getElementById('hTime').textContent =
+                String(now.getUTCHours()).padStart(2, '0') + ':' +
+                String(now.getUTCMinutes()).padStart(2, '0') + ' UTC';
+        }
+        update();
+        setInterval(update, 30000);
+
+        // ============================================================
+        // БЕЗОПАСНОСТЬ
+        // ============================================================
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('.main-content')) e.preventDefault();
+        });
+    </script>
+</body>
+</html>

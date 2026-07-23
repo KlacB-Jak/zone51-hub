@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL • ACCESS</title>
+    <link rel="icon" href="assets/icon.png" type="image/png">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#0A0E0A;--bg-terminal:#0F150F;--green-primary:#33FF33;--green-dim:#1A8A1A;--green-dark:#0D3D0D;--text:#B8E6B8;--text-dim:#4D8A4D;--text-error:#FF5555;--border:#1A3D1A}
+        body{background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Courier New','IBM Plex Mono',monospace;padding:1rem;position:relative;overflow:hidden;margin:0;cursor:default}
+        .crt-effect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.15) 80%,rgba(0,0,0,0.4) 100%)}
+        .crt-scanlines{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9997;background:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);animation:scanlinesMove 0.5s linear infinite}
+        @keyframes scanlinesMove{0%{background-position:0 0}100%{background-position:0 4px}}
+        .crt-reflect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9996;background:radial-gradient(ellipse at 20% 10%,rgba(255,255,255,0.02) 0%,transparent 60%)}
+        .crt-flicker{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9995;background:rgba(0,0,0,0.01);opacity:0;animation:flicker 8s ease-in-out infinite}
+        @keyframes flicker{0%,95%,100%{opacity:0}96%{opacity:0.3}97%{opacity:0}98%{opacity:0.15}99%{opacity:0}}
+        .moisture-effect{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9994;background:radial-gradient(ellipse at 60% 40%,rgba(100,180,200,0.02) 0%,rgba(100,180,200,0.01) 30%,transparent 70%);opacity:0.3;animation:moistureBreath 6s ease-in-out infinite}
+        @keyframes moistureBreath{0%,100%{opacity:0.2;transform:scale(1)}50%{opacity:0.5;transform:scale(1.05)}}
+        .moisture-droplets{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9993;background-image:radial-gradient(circle at 10% 20%,rgba(150,200,220,0.02) 2px,transparent 2px),radial-gradient(circle at 85% 70%,rgba(150,200,220,0.015) 1px,transparent 1px),radial-gradient(circle at 40% 90%,rgba(150,200,220,0.02) 3px,transparent 3px),radial-gradient(circle at 70% 15%,rgba(150,200,220,0.015) 1.5px,transparent 1.5px);background-size:100% 100%;animation:dropletsDrift 10s ease-in-out infinite}
+        @keyframes dropletsDrift{0%,100%{opacity:0.3;transform:translate(0,0) scale(1)}33%{opacity:0.5;transform:translate(-5px,3px) scale(1.02)}66%{opacity:0.4;transform:translate(3px,-5px) scale(0.98)}}
+        .terminal-glow{position:fixed;top:50%;left:50%;width:60%;height:60%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;background:radial-gradient(ellipse at center,rgba(51,255,51,0.04) 0%,rgba(51,255,51,0.02) 40%,transparent 70%);animation:glowPulse 4s ease-in-out infinite}
+        @keyframes glowPulse{0%,100%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
+        .tv-screen{width:100%;max-width:820px;position:relative;z-index:2;transform:scale(0);opacity:0;transition:transform 0.8s cubic-bezier(0.34,1.56,0.64,1),opacity 0.6s ease}
+        .tv-screen.active{transform:scale(1);opacity:1}
+        .terminal{width:100%;background:var(--bg-terminal);border:2px solid var(--green-dark);box-shadow:0 0 30px rgba(0,0,0,0.8),inset 0 0 60px rgba(0,0,0,0.3),0 0 80px rgba(51,255,51,0.03),0 0 150px rgba(51,255,51,0.01);position:relative;border-radius:4px;overflow:hidden}
+        .terminal.shifted{transform:translateY(-12px)}
+        .term-header{background:var(--bg);padding:0.7rem 1.8rem;border-bottom:2px solid var(--green-dark);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem}
+        .term-title{font-size:1.2rem;font-weight:700;color:var(--green-primary);letter-spacing:4px;text-transform:uppercase;text-shadow:0 0 20px rgba(51,255,51,0.08)}
+        .term-title .dot{display:inline-block;width:8px;height:8px;background:var(--green-primary);border-radius:50%;animation:blinkDot 1.2s step-end infinite;margin-right:8px;box-shadow:0 0 10px rgba(51,255,51,0.2)}
+        @keyframes blinkDot{0%,100%{opacity:1}50%{opacity:0.15}}
+        .term-status{font-size:0.7rem;color:var(--text-dim);background:var(--bg);padding:0.2rem 1rem;border:1px solid var(--green-dark);letter-spacing:1px;border-radius:2px;display:flex;align-items:center;gap:8px}
+        .term-status .timer{color:var(--green-primary);font-weight:700;font-size:0.75rem;min-width:30px;text-align:center}
+        .term-status .timer.warning{color:#FFAA33}
+        .term-status .timer.danger{color:var(--text-error);animation:timerBlink 0.5s step-end infinite}
+        @keyframes timerBlink{0%,100%{opacity:1}50%{opacity:0.2}}
+        .term-log{height:52vh;max-height:480px;overflow-y:auto;padding:1.5rem 1.8rem;background:var(--bg-terminal);font-size:0.85rem;line-height:1.6;color:var(--text);position:relative}
+        .term-log::-webkit-scrollbar{width:5px}
+        .term-log::-webkit-scrollbar-track{background:var(--bg)}
+        .term-log::-webkit-scrollbar-thumb{background:var(--green-dark);border-radius:2px}
+        .term-log .line{padding-left:12px;border-left:2px solid var(--green-dark);margin-bottom:3px;opacity:0.92;font-size:0.82rem;word-break:break-word;transition:all 0.3s}
+        .term-log .line .ts{color:var(--text-dim);font-size:0.7rem;margin-right:10px;opacity:0.7}
+        .term-log .line.ok{border-left-color:var(--green-primary)}
+        .term-log .line.err{border-left-color:var(--text-error);color:var(--text-error)}
+        .term-log .line.cursor-line{border-left-color:transparent;padding-left:0}
+        .term-log .line.glitch{animation:glitchLine 0.15s ease 3;color:var(--text-dim);border-left-color:var(--text-dim)}
+        @keyframes glitchLine{0%,100%{opacity:1;transform:translateX(0)}25%{opacity:0.3;transform:translateX(-3px)}50%{opacity:0.8;transform:translateX(2px)}75%{opacity:0.3;transform:translateX(-2px)}}
+        .cursor-blink{animation:blink 1s step-end infinite;color:var(--green-primary)}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.05}}
+        .term-auth{background:var(--bg);border-top:2px solid var(--green-dark);padding:0 1.8rem;display:none;align-items:center;flex-wrap:wrap;gap:1rem;max-height:0;opacity:0;overflow:hidden;transform:translateY(-20px);transition:max-height 0.7s cubic-bezier(0.34,1.56,0.64,1),opacity 0.6s ease 0.1s,transform 0.6s cubic-bezier(0.34,1.56,0.64,1),padding 0.5s ease}
+        .term-auth.active{display:flex;max-height:140px;opacity:1;padding:1rem 1.8rem;transform:translateY(0)}
+        .term-auth .label{color:var(--text);font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;font-weight:600;background:var(--bg-terminal);padding:0.2rem 1.2rem;border-left:3px solid var(--green-primary);opacity:0;transform:translateX(-10px);transition:opacity 0.4s ease 0.3s,transform 0.4s ease 0.3s}
+        .term-auth.active .label{opacity:1;transform:translateX(0)}
+        .term-auth input{background:var(--bg-terminal);border:2px solid var(--green-dark);color:var(--green-primary);font-family:'Courier New',monospace;font-size:1.1rem;padding:0.4rem 1rem;width:180px;outline:none;letter-spacing:4px;border-radius:2px;transition:border-color 0.2s,box-shadow 0.3s;opacity:0;transform:scale(0.95);transition:opacity 0.4s ease 0.4s,transform 0.4s ease 0.4s,border-color 0.2s,box-shadow 0.3s}
+        .term-auth.active input{opacity:1;transform:scale(1)}
+        .term-auth input:focus{border-color:var(--green-primary);box-shadow:0 0 25px rgba(51,255,51,0.08)}
+        .term-auth .btn{background:var(--bg-terminal);border:2px solid var(--green-primary);color:var(--green-primary);font-family:'Courier New',monospace;font-weight:700;padding:0.4rem 2rem;cursor:pointer;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;border-radius:2px;transition:all 0.25s ease;opacity:0;transform:scale(0.95);transition:opacity 0.4s ease 0.5s,transform 0.4s ease 0.5s,background 0.25s,color 0.25s,box-shadow 0.25s}
+        .term-auth.active .btn{opacity:1;transform:scale(1)}
+        .term-auth .btn:hover{background:var(--green-primary);color:var(--bg);box-shadow:0 0 40px rgba(51,255,51,0.12)}
+        .term-auth .error{color:var(--text-error);font-size:0.75rem;background:var(--bg-terminal);padding:0.2rem 1rem;border-left:3px solid var(--text-error);display:none;opacity:0;transform:translateX(-5px);transition:opacity 0.3s ease,transform 0.3s ease}
+        .term-auth .error.show{display:block;opacity:1;transform:translateX(0)}
+        .term-auth .locked-msg{color:var(--text-error);font-size:0.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:none;opacity:0;transition:opacity 0.5s ease}
+        .term-auth .locked-msg.show{display:block;opacity:1;animation:lockPulse 1s ease-in-out infinite}
+        @keyframes lockPulse{0%,100%{opacity:1}50%{opacity:0.3}}
+        .term-footer{background:var(--bg);border-top:1px solid var(--green-dark);padding:0.3rem 1.8rem;display:flex;justify-content:space-between;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase}
+        .tv-off-animation{animation:tvOff 0.6s cubic-bezier(0.6,0,0.4,1) forwards}
+        @keyframes tvOff{0%{opacity:1;transform:scale(1);filter:brightness(1) contrast(1)}10%{opacity:0.9;transform:scale(0.98);filter:brightness(0.8) contrast(1.2)}25%{opacity:0.4;transform:scale(0.92);filter:brightness(0.3) contrast(1.5)}40%{opacity:0.15;transform:scale(0.85);filter:brightness(0.1) contrast(2)}55%{opacity:0.05;transform:scale(0.78);filter:brightness(0.02) contrast(3)}70%{opacity:0.02;transform:scale(0.7);filter:brightness(0.005) contrast(5)}85%{opacity:0.01;transform:scale(0.65);filter:brightness(0.001) contrast(10)}100%{opacity:0;transform:scale(0.6);filter:brightness(0) contrast(20)}}
+        .tv-on-animation{animation:tvOn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards}
+        @keyframes tvOn{0%{opacity:0;transform:scale(0.6);filter:brightness(0) contrast(20)}20%{opacity:0.01;transform:scale(0.65);filter:brightness(0.001) contrast(10)}40%{opacity:0.05;transform:scale(0.75);filter:brightness(0.1) contrast(2)}55%{opacity:0.2;transform:scale(0.85);filter:brightness(0.4) contrast(1.3)}70%{opacity:0.6;transform:scale(0.95);filter:brightness(0.7) contrast(1.05)}85%{opacity:0.85;transform:scale(1.02);filter:brightness(0.95) contrast(0.98)}100%{opacity:1;transform:scale(1);filter:brightness(1) contrast(1)}}
+        .tv-flash{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(51,255,51,0.03);pointer-events:none;z-index:9999;opacity:0;animation:flashBurst 0.3s ease forwards}
+        @keyframes flashBurst{0%{opacity:1}50%{opacity:0.5}100%{opacity:0}}
+        .static-noise{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;opacity:0;background:repeating-conic-gradient(#000 0%,#fff 0.5%,#000 1%);background-size:2px 2px;animation:staticFlicker 0.08s steps(1) infinite;transition:opacity 0.1s}
+        .static-noise.active{opacity:0.12}
+        @keyframes staticFlicker{0%{transform:translate(0,0)}10%{transform:translate(-1px,1px)}20%{transform:translate(1px,-1px)}30%{transform:translate(-2px,0)}40%{transform:translate(2px,2px)}50%{transform:translate(0,-2px)}60%{transform:translate(-1px,2px)}70%{transform:translate(1px,1px)}80%{transform:translate(-2px,-1px)}90%{transform:translate(2px,-2px)}100%{transform:translate(0,0)}}
+
+        .init-overlay{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:10000;background:var(--bg);flex-direction:column;gap:2.5rem;transition:opacity 0.8s ease;background:radial-gradient(ellipse at center,var(--bg-terminal) 0%,var(--bg) 100%)}
+        .init-overlay.hidden{opacity:0;pointer-events:none}
+        .init-overlay .title{color:var(--text-dim);font-size:0.9rem;letter-spacing:10px;text-transform:uppercase;font-weight:300;font-family:'Courier New',monospace}
+        .init-overlay .line{width:160px;height:1px;background:linear-gradient(90deg,transparent,var(--green-dim),transparent)}
+        .init-btn{background:transparent;border:1.5px solid var(--green-primary);color:var(--green-primary);font-family:'Courier New',monospace;font-size:0.85rem;padding:0.7rem 3rem;cursor:pointer;letter-spacing:6px;text-transform:uppercase;transition:all 0.4s ease;border-radius:1px;font-weight:400}
+        .init-btn:hover{background:rgba(51,255,51,0.03);box-shadow:0 0 50px rgba(51,255,51,0.03);letter-spacing:8px}
+        .init-btn:active{transform:scale(0.97);background:rgba(51,255,51,0.05)}
+        .init-overlay .status{display:flex;align-items:center;gap:10px;margin-top:0.3rem;opacity:0.15}
+        .init-overlay .status .led{width:4px;height:4px;background:var(--green-dim);border-radius:50%;animation:ledBlink 2s step-end infinite}
+        @keyframes ledBlink{0%,100%{opacity:1}50%{opacity:0.1}}
+        .init-overlay .status .text{font-size:0.45rem;color:var(--text-dim);letter-spacing:4px;text-transform:uppercase;font-family:'Courier New',monospace}
+
+        @media (max-width:640px){.init-overlay .title{font-size:0.7rem;letter-spacing:6px}.init-btn{font-size:0.7rem;padding:0.5rem 2rem;letter-spacing:4px}}
+        @media (max-width:440px){.init-btn{font-size:0.6rem;padding:0.4rem 1.5rem;letter-spacing:3px}.init-overlay .title{font-size:0.55rem;letter-spacing:4px}}
+    </style>
+</head>
+<body>
+    <div class="crt-effect"></div>
+    <div class="crt-scanlines"></div>
+    <div class="crt-reflect"></div>
+    <div class="crt-flicker"></div>
+    <div class="moisture-effect"></div>
+    <div class="moisture-droplets"></div>
+    <div class="terminal-glow"></div>
+    <div class="static-noise" id="staticNoise"></div>
+
+    <div class="init-overlay" id="initOverlay">
+        <div class="title">FOUNDATION TERMINAL</div>
+        <div class="line"></div>
+        <button class="init-btn" id="initBtn">ИНИЦИАЛИЗИРОВАТЬ</button>
+        <div class="status">
+            <span class="led"></span>
+            <span class="text">ОЖИДАНИЕ ВХОДА</span>
+        </div>
+    </div>
+
+    <div class="tv-screen" id="tvScreen">
+        <div class="terminal" id="terminal">
+            <div class="term-header">
+                <span class="term-title"><span class="dot"></span>FOUNDATION TERMINAL</span>
+                <span class="term-status">SECURE <span class="timer" id="timerDisplay">--</span></span>
+            </div>
+            <div class="term-log" id="termLog"></div>
+            <div class="term-auth" id="termAuth">
+                <span class="label">ACCESS CODE</span>
+                <input type="password" id="passInput" placeholder="****" maxlength="8" autocomplete="off">
+                <button class="btn" id="unlockBtn">UNLOCK</button>
+                <span class="error" id="passError">ACCESS DENIED</span>
+                <span class="locked-msg" id="lockedMsg">⛔ SESSION LOCKED</span>
+            </div>
+            <div class="term-footer">
+                <span>SESSION ENCRYPTED</span>
+                <span>VERSION 0.5.1</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            'use strict';
+            var log=document.getElementById('termLog');
+            var authPanel=document.getElementById('termAuth');
+            var passInput=document.getElementById('passInput');
+            var unlockBtn=document.getElementById('unlockBtn');
+            var passError=document.getElementById('passError');
+            var lockedMsg=document.getElementById('lockedMsg');
+            var timerDisplay=document.getElementById('timerDisplay');
+            var tvScreen=document.getElementById('tvScreen');
+            var terminal=document.getElementById('terminal');
+            var staticNoise=document.getElementById('staticNoise');
+            var initOverlay=document.getElementById('initOverlay');
+            var initBtn=document.getElementById('initBtn');
+
+            var ambientAudio=null;
+            var isMusicPlaying=false;
+            var musicStarted=false;
+
+            function playMusic(filePath,volume){
+                if(musicStarted) return ambientAudio;
+                musicStarted=true;
+                try{
+                    var audio=new Audio(filePath);
+                    audio.loop=true;
+                    audio.volume=volume||0.1;
+                    var promise=audio.play();
+                    if(promise){
+                        promise.then(function(){
+                            isMusicPlaying=true;
+                            console.log('[AUDIO] Music started');
+                        }).catch(function(){
+                            document.addEventListener('click',function startOnClick(){
+                                audio.play().then(function(){
+                                    isMusicPlaying=true;
+                                    console.log('[AUDIO] Music started after click');
+                                }).catch(function(){});
+                                document.removeEventListener('click',startOnClick);
+                            },{once:true});
+                        });
+                    }
+                    ambientAudio=audio;
+                    return audio;
+                }catch(e){return null;}
+            }
+
+            function stopMusic(){
+                try{
+                    if(ambientAudio){
+                        ambientAudio.pause();
+                        ambientAudio.currentTime=0;
+                        ambientAudio=null;
+                        isMusicPlaying=false;
+                        musicStarted=false;
+                    }
+                }catch(e){}
+            }
+
+            function playSound(name){
+                try{
+                    var audio=new Audio('assets/sounds/'+name+'.mp3');
+                    audio.volume=0.2;
+                    audio.play().catch(function(){});
+                }catch(e){}
+            }
+
+            var keypressTimer=null;
+            function playKeypress(){
+                if(keypressTimer)return;
+                playSound('keypress');
+                keypressTimer=setTimeout(function(){keypressTimer=null;},80);
+            }
+
+            passInput.addEventListener('keydown',function(){
+                if(!locked&&passInput.value.length<8)playKeypress();
+            });
+
+            var bootMessages=[
+                '[BIOS] POST: PASS. CPU: Intel Xeon E5-2680 v4',
+                '[BIOS] Memory test: 16384MB OK, ECC enabled',
+                '[BIOS] SATA: 3 devices detected, AHCI mode',
+                '[BOOT] Loading GRUB 2.04 ...',
+                '[BOOT] Kernel image: /boot/vmlinuz-5.10.0-scp',
+                '[KERNEL] Linux 5.10.0-scp (SMP PREEMPT)',
+                '[KERNEL] Command line: console=tty0 ro root=/dev/sda1',
+                '[KERNEL] 14 cores / 28 threads detected',
+                '[KERNEL] ACPI: RSDP found at 0x7F5E3000',
+                '[SEC] TPM 2.0: firmware 7.85, secure boot ENABLED',
+                '[SEC] Platform integrity: PASS',
+                '[NET] e1000e: eth0 link up, 1000Mbps full duplex',
+                '[NET] IPv6: disabled by kernel parameter',
+                '[FILESYSTEM] EXT4-fs: /dev/sda2 mounted (errors=remount-ro)',
+                '[FILESYSTEM] Mounting /secure: OK',
+                '[SERVICE] systemd[1]: Starting udev Kernel Device Manager',
+                '[SERVICE] systemd[1]: Started journald (log namespace)',
+                '[DAEMON] sshd: listening on port 2222 (custom)',
+                '[DAEMON] crond: PID 742 started',
+                '[FIREWALL] nftables: 42 rules applied, 2 chains',
+                '[AUDIT] auditd: initialized (backlog limit 8192)',
+                '[SCP-NET] Handshake with Site-19 gateway ... ESTABLISHED',
+                '[SCP-NET] Site-64: outbound queue high latency (32ms)',
+                '[CRYPTO] Hardware acceleration: AES-NI, SHA-NI active',
+                '[MEM] ZRAM: swap device initialized (2048MB)',
+                '[DB] PostgreSQL 13.4: accepting connections on 5432',
+                '[RUNTIME] Python 3.9.2 virtual env loaded',
+                '[SERVICE] nginx: starting (main process PID 892)',
+                '[KERNEL] Loaded module: scp_audit.ko (sig verified)',
+                '[SCHED] CPU governor: performance (scaling driver: intel_pstate)',
+                '[WATCHDOG] watchdog: hardware timer enabled (60s)',
+                '[AUDIT] SELinux: policy version 33, enforcing mode',
+                '[INFO] Overlayfs: /tmp/container mounted',
+                '[SYSLOG] rsyslogd: start, imuxsock, imklog, imudp',
+                '[DAEMON] snmpd: listening on UDP 161 (v2c only)',
+                '[SCP-079] Interface: veth0: link up (virtual)',
+                '[ALERT] IDS signature set: 2026-03-15 rev 4421',
+                '[INFO] Starting foundation-webapp (PID 1142)',
+                '[STATUS] All critical services: ONLINE',
+                '[OK] Boot completed in 10.02 seconds',
+                '>_ WELCOME TO FOUNDATION INTRANET',
+                '>_ VERIFYING ACCESS PERMISSIONS...'
+            ];
+
+            var totalMessages=bootMessages.length;
+            var targetTime=10000;
+            var baseDelay=Math.floor(targetTime/totalMessages);
+            var delays=[];
+            for(var i=0;i<totalMessages;i++){
+                var variation=0.6+Math.random()*0.8;
+                delays.push(Math.floor(baseDelay*variation));
+            }
+
+            var bootDone=false;
+            var timer=45;
+            var timerInterval=null;
+            var locked=false;
+            var glitchInterval=null;
+
+            function ts(){
+                var d=new Date();
+                return '['+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0')+']';
+            }
+
+            function addLine(msg,cls){
+                cls=cls||'';
+                var div=document.createElement('div');
+                div.className='line'+(cls?' '+cls:'');
+                div.innerHTML='<span class="ts">'+ts()+'</span> '+msg;
+                log.appendChild(div);
+                log.scrollTop=log.scrollHeight;
+            }
+
+            function boot(){
+                log.innerHTML='';
+                addLine('FOUNDATION TERMINAL [build: 2026-04-04]','ok');
+                addLine('>_ ESTABLISHING SECURE CONNECTION ...','ok');
+                addLine('>_ LOADING CORE MODULES ...','ok');
+
+                playSound('boot');
+
+                var lineIndex=0;
+                function nextLine(){
+                    if(lineIndex<totalMessages){
+                        var msg=bootMessages[lineIndex];
+                        var cls=msg.includes('ERROR')||msg.includes('FAIL')?'err':(msg.includes('OK')||msg.includes('ONLINE')?'ok':'');
+                        addLine(msg,cls);
+                        lineIndex++;
+                        var delay=delays[lineIndex-1]||baseDelay;
+                        var actualDelay=delay;
+                        if(Math.random()>0.92)actualDelay=delay*2.5;
+                        if(Math.random()>0.95)actualDelay=delay*0.4;
+                        setTimeout(nextLine,actualDelay);
+                    }else{
+                        finish();
+                    }
+                }
+                setTimeout(nextLine,100);
+            }
+
+            function finish(){
+                addLine('═══════════════════════════════════════════════','ok');
+                addLine('[OK] ALL SYSTEMS OPERATIONAL. SECURE CHANNEL READY.','ok');
+                addLine('[INFO] AUTHENTICATION REQUIRED FOR INTRANET ACCESS','ok');
+                addLine('>_ ACCESS RESTRICTED TO AUTHORIZED PERSONNEL','ok');
+                addLine('═══════════════════════════════════════════════','ok');
+
+                var cursorLine=document.createElement('div');
+                cursorLine.className='line cursor-line';
+                cursorLine.innerHTML='<span class="ts">'+ts()+'</span> >_ awaiting authorization <span class="cursor-blink">_</span>';
+                log.appendChild(cursorLine);
+                log.scrollTop=log.scrollHeight;
+
+                terminal.classList.add('shifted');
+
+                setTimeout(function(){
+                    authPanel.classList.add('active');
+                    passInput.focus();
+                    startTimer();
+                    startGlitches();
+                },500);
+
+                bootDone=true;
+            }
+
+            function startTimer(){
+                timer=45;
+                updateTimerDisplay();
+                timerInterval=setInterval(function(){
+                    timer--;
+                    updateTimerDisplay();
+                    if(timer<=0)lockSession();
+                },1000);
+            }
+
+            function updateTimerDisplay(){
+                if(locked){
+                    timerDisplay.textContent='LOCK';
+                    timerDisplay.className='timer danger';
+                    return;
+                }
+                timerDisplay.textContent=timer+'s';
+                timerDisplay.className=timer<=10?'timer danger':(timer<=20?'timer warning':'timer');
+            }
+
+            function resetTimer(){
+                if(locked)return;
+                clearInterval(timerInterval);
+                timer=45;
+                updateTimerDisplay();
+                timerInterval=setInterval(function(){
+                    timer--;
+                    updateTimerDisplay();
+                    if(timer<=0)lockSession();
+                },1000);
+            }
+
+            function lockSession(){
+                if(locked)return;
+                locked=true;
+                clearInterval(timerInterval);
+                timerDisplay.textContent='LOCK';
+                timerDisplay.className='timer danger';
+                passInput.disabled=true;
+                passInput.style.opacity='0.3';
+                unlockBtn.disabled=true;
+                unlockBtn.style.opacity='0.3';
+                lockedMsg.classList.add('show');
+                passError.classList.remove('show');
+                addLine('[SYSTEM] SESSION LOCKED - TIMEOUT','err');
+                addLine('[SECURITY] CONTACT SYSTEM ADMINISTRATOR','err');
+                playSound('access-denied');
+            }
+
+            function startGlitches(){
+                glitchInterval=setInterval(function(){
+                    if(bootDone&&!locked&&Math.random()>0.88){
+                        var msgs=[
+                            '[WARN] Unstable memory block detected at 0x7F3A2B',
+                            '[ERROR] CRC mismatch in log buffer',
+                            '[KERNEL] Page fault (non-fatal)',
+                            '[AUDIT] Unexpected event ID 0x89',
+                            '[SCP-NET] Packet loss: 0.3%',
+                            '[HW] Thermal spike detected in CPU core 3',
+                            '[SYS] Scheduler overload: 42 tasks pending',
+                            '[NET] RTT spike: 142ms to gateway',
+                            '[DAEMON] Restarting service: syslog-ng',
+                            '[FS] Inode corruption detected in /tmp'
+                        ];
+                        var msg=msgs[Math.floor(Math.random()*msgs.length)];
+                        addLine(msg,'glitch');
+                        playSound('click');
+                        setTimeout(function(){
+                            addLine('[SYSTEM] Auto-recovery in progress...','ok');
+                        },400);
+                    }
+                },7000);
+            }
+
+            function showStatic(duration){
+                staticNoise.classList.add('active');
+                setTimeout(function(){staticNoise.classList.remove('active');},duration||300);
+            }
+
+            function tvOff(callback){
+                showStatic(200);
+                tvScreen.classList.add('tv-off-animation');
+                playSound('tv-off');
+                setTimeout(function(){
+                    tvScreen.classList.remove('tv-off-animation');
+                    if(callback)callback();
+                },650);
+            }
+
+            function checkPass(){
+                if(!bootDone){
+                    passError.textContent='BOOT NOT COMPLETE';
+                    passError.classList.add('show');
+                    setTimeout(function(){passError.classList.remove('show');},1200);
+                    return;
+                }
+                if(locked){
+                    passError.textContent='SESSION LOCKED';
+                    passError.classList.add('show');
+                    setTimeout(function(){passError.classList.remove('show');},1500);
+                    return;
+                }
+                var val=passInput.value.trim();
+                if(val==='1234'||val==='admin1'){
+                    playSound('access-granted');
+                    stopMusic();
+                    clearInterval(timerInterval);
+                    clearInterval(glitchInterval);
+                    showStatic(300);
+                    tvOff(function(){
+                        window.location.href='main.html';
+                    });
+                }else{
+                    playSound('access-denied');
+                    passError.textContent='ACCESS DENIED';
+                    passError.classList.add('show');
+                    passInput.value='';
+                    passInput.focus();
+                    resetTimer();
+                    authPanel.style.transform='translateX(4px)';
+                    setTimeout(function(){authPanel.style.transform='translateX(-2px)';},50);
+                    setTimeout(function(){authPanel.style.transform='translateX(0)';},100);
+                    addLine('[AUTH] FAILED authentication attempt','err');
+                    setTimeout(function(){
+                        passError.classList.remove('show');
+                        authPanel.style.transform='';
+                    },1600);
+                }
+            }
+
+            unlockBtn.addEventListener('click',checkPass);
+            passInput.addEventListener('keydown',function(e){
+                if(e.key==='Enter'){
+                    e.preventDefault();
+                    checkPass();
+                }
+            });
+
+            document.addEventListener('contextmenu',function(e){
+                if(e.target.closest('.terminal'))e.preventDefault();
+            });
+
+            initBtn.addEventListener('click',function(){
+                initOverlay.classList.add('hidden');
+                tvScreen.classList.add('active');
+                var savedTime = sessionStorage.getItem('musicTime');
+                var audio = playMusic('assets/sounds/ambient-main.mp3',0.1);
+                if(audio && savedTime){
+                    audio.currentTime = parseFloat(savedTime);
+                }
+                setTimeout(function(){
+                    boot();
+                },800);
+            });
+
+            setInterval(function(){
+                if(ambientAudio && isMusicPlaying){
+                    try{
+                        sessionStorage.setItem('musicTime', ambientAudio.currentTime);
+                    }catch(e){}
+                }
+            },1000);
+
+            document.addEventListener('visibilitychange', function(){
+                if(ambientAudio){
+                    if(document.hidden){
+                        ambientAudio.volume = 0;
+                    } else {
+                        ambientAudio.volume = 0.1;
+                    }
+                }
+            });
+
+            setInterval(function(){
+                if(Math.random()>0.92){
+                    document.body.style.backgroundColor='#080C08';
+                    setTimeout(function(){document.body.style.backgroundColor='';},35);
+                }
+                if(Math.random()>0.95){
+                    var flicker=document.querySelector('.crt-flicker');
+                    if(flicker){
+                        flicker.style.opacity='0.5';
+                        setTimeout(function(){flicker.style.opacity='0';},60);
+                    }
+                }
+            },4000);
+
+        })();
+    </script>
+</body>
+</html>
